@@ -1,7 +1,11 @@
+import csv
+
 def common_neighbors(test_g, train_g):
-    f = open("common_neighbors.txt","wb")
-    for edge in test_g.edges():
-        node_one, node_two = edge[0], edge[1]
+    csvfile = file("common_neighbors.csv","wb")
+    writer = csv.writer(csvfile)
+    writer.writerow(['node1',"node2","num_common_neighbors","positive"])
+    for edge in test_g.edges(data=True):
+        node_one, node_two, tag = edge[0], edge[1], edge[2]['positive']
         num_common_neighbors = 0
         try:
             neighbors_one, neighbors_two = train_g.neighbors(node_one), train_g.neighbors(node_two)
@@ -10,6 +14,5 @@ def common_neighbors(test_g, train_g):
                     num_common_neighbors += 1
         except:
             pass
-        f.write(str(node_one)+" "+str(node_two)+" "+str(num_common_neighbors)+"\n")
-
-    f.close()
+        writer.writerow([node_one, node_two, num_common_neighbors,tag])
+    csvfile.close()
