@@ -10,8 +10,8 @@ from common_neighbors import common_neighbors
   g.edges() is the list of edges
 
 2.10% edges is randomly deleted from the graph, together with 10% randomly
-  created non-existing edges using nodes from the deleted subgraph are treated
-  as test set,the rest is the training set.
+  created non-existing edges(at a distance of 2) using nodes from the deleted
+  subgraph are treated as test set,the rest is the training set.
 
 3.for each feature calculation subroutine, training graph train_g and test
   graph test_g passed as argument and the subroutine returns the corresponding
@@ -36,21 +36,25 @@ if __name__ == "__main__":
     num_test_edges = int(math.floor(0.1 * num_edges))
     test_edges = random.sample(g.edges(), num_test_edges)
     test_g = nx.Graph()
-    test_g.add_edges_from(test_edges, postive="True")
-    nx.write_edgelist(test_g, "testing_positive.txt", data=['postive'])
+    test_g.add_edges_from(test_edges, positive="True")
+    nx.write_edgelist(test_g, "testing_positive.txt", data=['positive'])
 
     #adding non-existing edges
     f_negative = open("testing_negative.txt","wb")
     i = 0
     while i < num_test_edges:
         edge = random.sample(test_g.nodes(), 2)
-        if not g.has_edge(edge[0],edge[1]):
-            test_g.add_edge(edge[0],edge[1], postive="False")
-            f_negative.write(str(edge[0])+" "+str(edge[1])+" False\n")
-            i += 1
+        try:
+            shortest_path = nx.shortest_path_length(g,source=edge[0],target=edge[1])
+            if shortest_path == 2:
+                test_g.add_edge(edge[0],edge[1], positive="False")
+                f_negative.write(str(edge[0])+" "+str(edge[1])+" False\n")
+                i += 1
+        except:
+            pass
     f_negative.close()
 
-    nx.write_edgelist(test_g, "testing_combined.txt", data = ["postive"])
+    nx.write_edgelist(test_g, "testing_combined.txt", data = ["positive"])
 
     #remove the selected 10% edges, the rest is the training set
     g.remove_edges_from(test_edges)
