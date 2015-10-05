@@ -25,7 +25,7 @@ from common_neighbors import common_neighbors
 
 5.keep in mind that test nodes may not be in the training set.
 '''
-if __name__ == "__main__":
+def createGraphFromFile(filename):
     f = open("facebook_combined.txt", "rb")
     g = nx.read_edgelist(f)
     num_edges = g.number_of_edges()
@@ -60,9 +60,4 @@ if __name__ == "__main__":
     g.remove_edges_from(test_edges)
     train_g = g
     nx.write_edgelist(train_g, "training.txt", data = False)
-    '''
-	call subroutines down here, all subroutines should have train_g, test_g as the arguments.
-	calculate the feature for each edge in the test graph test_g, and output the corresponding file
-	for the corresponding feature using training graph train_g. (e.g. "common_neighbors.txt")
-    '''
-    common_neighbors(test_g, train_g)
+
