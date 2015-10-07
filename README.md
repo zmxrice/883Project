@@ -1,5 +1,5 @@
 # 883Project
-
+The version of networkx we use is 1.10.
 Here is a list of features the networkx library has:
 1. adar
 2. jaccard

@@ -2,7 +2,7 @@ import networkx as nx
 import random
 import math
 
-from common_neighbors import common_neighbors
+from features import common_neighbors
 
 '''
 1.the main method reads from a .txt file and convert the edge list into a graph
