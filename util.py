@@ -36,6 +36,7 @@ def sample_extraction(g, pos_num, neg_num, neg_distance=2, delete=0):
     i = 0
     neg_g = nx.Graph()
     while i < neg_num:
+        print(i)
         edge = random.sample(g.nodes(), 2)
         try:
             shortest_path = nx.shortest_path_length(g, source=edge[0], target=edge[1])
@@ -68,7 +69,7 @@ def feature_extraction(g, pos_sample, neg_sample, feature_name, model="single", 
     :param neg_sample : the negative samples
     :param feature_name: name of the feature fucntion
     :param model:
-    :return: the extracted feature and the last column is the label, 1 means positive, 0 means negative
+    :return: the extracted feature and the last column is the label, "pos" means positive, "neg" means negative
     """
 
     data = []
@@ -76,17 +77,17 @@ def feature_extraction(g, pos_sample, neg_sample, feature_name, model="single", 
         print "-----extract feature:", feature_name.__name__, "----------"
         preds = feature_name(g, pos_sample)
         feature = [feature_name.__name__] + [i[2] for i in preds]
-        label = ["label"] + [1 for i in range(len(feature))]
+        label = ["label"] + ["Pos" for i in range(len(feature))]
         preds = feature_name(g, neg_sample)
         feature1 = [i[2] for i in preds]
         feature = feature + feature1
-        label = label + [0 for i in range(len(feature1))]
+        label = label + ["Neg" for i in range(len(feature1))]
         data = [feature, label]
         data = transpose(data)
         print("----------write the feature to file---------------")
         write_data_to_file(data, "features_" + model + "_" + feature_name.__name__ + ".csv")
     else:
-        label = ["label"] + [1 for i in range(len(pos_sample))] + [0 for i in range(len(neg_sample))]
+        label = ["label"] + ["Pos" for i in range(len(pos_sample))] + ["neg" for i in range(len(neg_sample))]
         for j in feature_name:
             print "-----extract feature:", j.__name__, "----------"
             preds = j(g, pos_sample)
