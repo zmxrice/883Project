@@ -28,8 +28,8 @@ This is the entrance of this project
 """
 
 
-def main(filename="facebook_combined.txt", pos_num=0.1, neg_num=0.1, model="single", combine_num=5,
-         feature_name=common_neighbors):
+def main(filename="Email-Enron.txt", pos_num=0.1, neg_num=0.1, model="single", combine_num=5,
+         feature_name=common_neighbors, neg_mode="hard"):
     """
 
     :param filename: the graph file
@@ -39,13 +39,15 @@ def main(filename="facebook_combined.txt", pos_num=0.1, neg_num=0.1, model="sing
     :param combine_num: the number of combined features
     :param feature_name: if model is "single", this parameter will be the name of the feature. if model is "combined"
                         this parameter will be the list of features
+    :param neg_mode : "easy" means the distance between two nodes in a negative edge is greater than 2. "hard" means
+                      it is exactly 2.
     :return:
     """
     g = create_graph_from_file(filename)
     num_edges = g.number_of_edges()
     pos_num = int(num_edges * pos_num)
     neg_num = int(num_edges * neg_num)
-    pos_sample, neg_sample = sample_extraction(g, pos_num, neg_num)
+    pos_sample, neg_sample = sample_extraction(g, pos_num, neg_num,neg_mode)
     train_data = feature_extraction(g, pos_sample, neg_sample, feature_name, model, combine_num)
 
 
@@ -56,4 +58,4 @@ if __name__ == "__main__":
                    nx.adamic_adar_index,
                    nx.preferential_attachment
                    ]
-    main(model="combined", combine_num=5, feature_name=feature_set)
+    main(model="combined", combine_num=5, feature_name=feature_set, neg_mode="easy")

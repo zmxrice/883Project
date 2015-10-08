@@ -13,7 +13,7 @@ def create_graph_from_file(filename):
     return g
 
 
-def sample_extraction(g, pos_num, neg_num, neg_distance=2, delete=0):
+def sample_extraction(g, pos_num, neg_num, neg_mode, neg_distance=2, delete=0):
     """
 
     :param g:  the graph
@@ -36,13 +36,17 @@ def sample_extraction(g, pos_num, neg_num, neg_distance=2, delete=0):
     i = 0
     neg_g = nx.Graph()
     while i < neg_num:
-        print(i)
         edge = random.sample(g.nodes(), 2)
         try:
             shortest_path = nx.shortest_path_length(g, source=edge[0], target=edge[1])
-            if shortest_path == neg_distance:
-                neg_g.add_edge(edge[0], edge[1], positive="False")
-                i += 1
+            if neg_mode == "hard":
+                if shortest_path == neg_distance:
+                    neg_g.add_edge(edge[0], edge[1], positive="False")
+                    i += 1
+            elif neg_mode == "easy":
+                if shortest_path >= neg_distance:
+                    neg_g.add_edge(edge[0], edge[1], positive="False")
+                    i += 1
         except:
             pass
 
@@ -114,4 +118,3 @@ def write_data_to_file(data, filename):
 
 def transpose(data):
     return [list(i) for i in zip(*data)]
-
