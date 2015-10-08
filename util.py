@@ -36,7 +36,6 @@ def sample_extraction(g, pos_num, neg_num, neg_distance=2, delete=0):
     i = 0
     neg_g = nx.Graph()
     while i < neg_num:
-        print(i)
         edge = random.sample(g.nodes(), 2)
         try:
             shortest_path = nx.shortest_path_length(g, source=edge[0], target=edge[1])
