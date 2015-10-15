@@ -1,4 +1,5 @@
 *.txt
+*.gz
 *.pyc
 *.csv
 test.py
