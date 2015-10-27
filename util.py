@@ -1,10 +1,22 @@
-__author__ = 'easycui'
 import networkx as nx
 import random
 import math
 import csv
+import multiprocessing as mp
+
 from features import *
 
+def produce_fake_edge(g, neg_g,task_per_thread):
+    i = 0
+    while i < task_per_thread:
+        edge = random.sample(g.nodes(), 2)
+        try:
+            shortest_path = nx.shortest_path_length(g,source=edge[0],target=edge[1])
+            if shortest_path == 2:
+                neg_g.add_edge(edge[0],edge[1], positive="False")
+                i += 1
+        except:
+            pass
 
 def create_graph_from_file(filename):
     print("----------------build graph--------------------")
@@ -35,20 +47,11 @@ def sample_extraction(g, pos_num, neg_num, neg_mode, neg_distance=2, delete=0):
     print("----------------extract negative samples--------------------")
     i = 0
     neg_g = nx.Graph()
-    while i < neg_num:
-        edge = random.sample(g.nodes(), 2)
-        try:
-            shortest_path = nx.shortest_path_length(g, source=edge[0], target=edge[1])
-            if neg_mode == "hard":
-                if shortest_path == neg_distance:
-                    neg_g.add_edge(edge[0], edge[1], positive="False")
-                    i += 1
-            elif neg_mode == "easy":
-                if shortest_path >= neg_distance:
-                    neg_g.add_edge(edge[0], edge[1], positive="False")
-                    i += 1
-        except:
-            pass
+    num_threads = 30
+    task_per_thread = neg_num / num_threads
+    for i in range(num_threads):
+        p = mp.Process(target=produce_fake_edge, args=(g, neg_g,task_per_thread))
+        p.start()
 
     nx.write_edgelist(neg_g, "sample_negative_" + str(neg_num) + ".txt", data=["positive"])
     neg_sample = neg_g.edges()
