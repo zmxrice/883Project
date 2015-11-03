@@ -3,7 +3,8 @@ import random
 import math
 import csv
 import multiprocessing as mp
-
+import numpy as np
+import matplotlib.pyplot as plt
 from features import *
 
 def produce_fake_edge(g, neg_g,task_per_thread):
@@ -18,6 +19,89 @@ def produce_fake_edge(g, neg_g,task_per_thread):
         except:
             pass
 
+def create_snapshots(filename,gNum,startpoint):
+    """
+
+    :param filename:  source data file : node1 node2 weight time
+    :param gNum: number of graphs
+    :return: return snapshots, would be a list of graph, each graph is a list of edges,
+    and each edge is a list[node1 ,node2, timestamp]
+    """
+    snapshots=[]
+    with open(filename) as f:
+        f.readline()
+        f.readline()
+        array=[]
+        for line in f:
+            array.append(int(line.split()[3]))
+    times=list(sorted(set(array)))
+
+    timestep=int(times[-1]-times[startpoint])/gNum/86400
+
+    with open(filename) as f:
+        f.readline()
+        f.readline()
+
+        data=[]
+        for line in f:
+            items=line.split()
+            items=[int(items[0]),int(items[1]),(int(items[-1]) - times[startpoint])/86400]
+            data.append(items)
+
+    d=dict()
+    for j in data:
+        if j[2] <= times[startpoint]:
+            if j[0] not in d:
+                d[j[0]]=1
+            if j[1] not in d:
+                d[j[1]]=1
+
+    for i in range(gNum):
+        graph=[]
+        for j in data:
+            if j[0] in d and j[1] in d and j[2] <= startpoint+i*timestep:
+                graph.append(j[:2])
+        print(len(graph))
+        snapshots.append(graph)
+
+    return snapshots
+
+
+def show_network_evolution(filename):
+    with open(filename) as f:
+        f.readline()
+        f.readline()
+        array=[]
+        for line in f:
+            array.append(int(line.split()[3]))
+    times=list(sorted(set(array)))
+    days=np.zeros(len(times))
+    for i in range(1,len(times)):
+        days[i]=int((times[i]-times[0])/86400)
+    print days
+    with open(filename) as f:
+        f.readline()
+        f.readline()
+
+        data=[]
+        for line in f:
+            items=line.split()
+            items=items[:2]+[items[-1]]
+            data.append(items)
+    x=range(1,len(times)+1)
+    y=np.zeros(len(times))
+    for i in x:
+        d=dict()
+        for j in data:
+            if int(j[2]) in times[:i]:
+                if int(j[0]) not in d:
+                    d[int(j[0])]=1
+                if int(j[1]) not in d:
+                    d[int(j[1])]=1
+        y[i-1]=len(d.keys())
+        print(y[i-1])
+    plt.plot(days,y)
+    plt.show()
 def create_graph_from_file(filename):
     print("----------------build graph--------------------")
     f = open(filename, "rb")
@@ -121,3 +205,5 @@ def write_data_to_file(data, filename):
 
 def transpose(data):
     return [list(i) for i in zip(*data)]
+
+create_snapshots("./out.youtube-u-growth",5,0)
