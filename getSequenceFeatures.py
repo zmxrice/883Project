@@ -30,13 +30,24 @@ def JaccardCoefficent(u, v, g):
 def PreferentialAttachment(u, v, g):
     return len(g.neighbors(u))*len(g.neighbors(v))
 
-def DeltaFeatures(u,v,g1, g2):
+def AllFeatures(u,v,g1, g2):
     '''
     the change of features in two consecutive sub graphs
     '''
-    delta_cn = CommonNeighbors(u, v, g2) - CommonNeighbors(u, v, g1)
-    delta_aa = AdamicAdar(u, v, g2) - AdamicAdar(u, v, g1)
-    delta_ra = ResourceAllocation(u, v, g2) - ResourceAllocation(u, v, g1)
-    delta_jc = JaccardCoefficent(u, v, g2) - JaccardCoefficent(u, v, g1)
-    delta_pa = PreferentialAttachment(u, v, g2) - PreferentialAttachment(u, v, g1)
-    return {"delta_cn": delta_cn, "delta_aa": delta_aa, "delta_ra": delta_ra, "delta_jc": delta_jc, "delta_pa": delta_pa}
+    try:
+        cn = CommonNeighbors(u, v, g2)
+        aa = AdamicAdar(u, v, g2)
+        ra = ResourceAllocation(u, v, g2)
+        jc = JaccardCoefficent(u, v, g2)
+        pa = PreferentialAttachment(u, v, g2)
+
+        delta_cn = cn - CommonNeighbors(u, v, g1)
+        delta_aa = aa - AdamicAdar(u, v, g1)
+        delta_ra = ra - ResourceAllocation(u, v, g1)
+        delta_jc = jc - JaccardCoefficent(u, v, g1)
+        delta_pa = pa - PreferentialAttachment(u, v, g1)
+        return {"cn":cn, "aa": aa, "ra":ra, "jc":jc, "pa":pa,
+            "delta_cn": delta_cn, "delta_aa": delta_aa, "delta_ra": delta_ra,
+             "delta_jc": delta_jc, "delta_pa": delta_pa}
+    except:
+        pass
