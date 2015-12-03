@@ -31,10 +31,10 @@ def myTree(training, training_labels, testing, testing_labels):
     finish = datetime.datetime.now()
     print (finish-start).seconds
 
-if __name__ == "__main__":
+def produceTrainingSet(mid, end, path):
     training, testing = [], []
-    for i in xrange(10):
-        f = open("result/features"+str(i)+".csv", 'rb')
+    for i in xrange(mid):
+        f = open(path+"result/features"+str(i)+".csv", 'rb')
         reader = csv.reader(f)
         reader.next()
         training.extend(list(reader))
@@ -42,8 +42,8 @@ if __name__ == "__main__":
 
     print "+++++++++ Finishing reading training set +++++++++++"
 
-    for i in xrange(10,25):
-        f = open("result/features"+str(i)+".csv", 'rb')
+    for i in xrange(mid,end):
+        f = open(path+"result/features"+str(i)+".csv", 'rb')
         reader = csv.reader(f)
         reader.next()
         testing.extend(list(reader))
@@ -51,12 +51,13 @@ if __name__ == "__main__":
 
     print "+++++++++ Finishing reading testing set ++++++++++++"
 
-    train = open("result/training.csv", 'wb')
-    test = open("result/testing.csv", 'wb')
+    train = open(path+"result/training.csv", 'wb')
+    test = open(path+"result/testing.csv", 'wb')
 
     features = ["cn","aa","ra","jc","pa","delta_cn", "delta_aa", "delta_ra", "delta_jc", "delta_pa", "postive"]
     wr = csv.writer(train, delimiter=',', quoting=csv.QUOTE_ALL)
     wr.writerow(features)
+    print len(training), len(testing)
     for i in training:
         wr.writerow(i)
 
@@ -66,12 +67,28 @@ if __name__ == "__main__":
         wr1.writerow(i)
 
     train.close(); test.close()
+if __name__ == "__main__":
+    path = "data/gap30/"
+    mid, end = 30, 56
+    produceTrainingSet(mid, end, path)
 
+    path = "data/gap90/"
+    mid, end = 9, 18
+    produceTrainingSet(mid, end, path)
 
+    path = "data/gap180/"
+    mid, end = 5, 9
+    produceTrainingSet(mid, end, path)
+
+    path = "data/gap300/"
+    mid, end = 3, 5
+    produceTrainingSet(mid, end, path)
+
+    '''
     training_labels = [i.pop() for i in training]
     testing_labels = [i.pop() for i in testing]
 
-    #p1 = mp.Process(target=mySvm, args=(training, training_labels, testing, testing_labels))
+    p1 = mp.Process(target=mySvm, args=(training, training_labels, testing, testing_labels))
     p2 = mp.Process(target=myTree, args=(training, training_labels, testing, testing_labels))
-    #p1.start()
-    p2.start()
+    p1.start()
+    p2.start()'''
